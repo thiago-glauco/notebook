@@ -1,0 +1,19 @@
+{
+  "name": "notebook",
+  "version": "1.0.0",
+  "description": "Just playing arround with github, node, express, minimist, sqlite, lodash and so on...",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thiago-glauco/notebook.git"
+  },
+  "author": "thiago glauco sanchez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thiago-glauco/notebook/issues"
+  },
+  "homepage": "https://github.com/thiago-glauco/notebook#readme"
+}
