@@ -1,9 +1,12 @@
 /**
  * Just a simple note class
  */
-export default class Note {
+class Note {
+    #id;
     title;
     owner;
     content;
     timestamp;
 }
+
+module.exports = Note

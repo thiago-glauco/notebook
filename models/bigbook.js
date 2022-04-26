@@ -1,29 +1,31 @@
 const sqlite = require("sqlite3");
 const queries = require("../libs/sqlite_templates");
+const Notebook = require( "./notebook" );
 
 class BigBook {
     /**
      * Métodos públicos:
      *  getNotebooks
      *  findNotebooks
-     *  create notebook
-     *  delete notebook
+     *  createNotebook
+     *  deleteNotebook
      *  renameNotebook
      *  cleanAll
+     *  openNotebook
+     *  closeNotebook
      */
     
     #db
     #sthGetNotebooks
     notebooks
+    openedNotebooks
 
     constructor( ) {
         this.#db = new sqlite.Database( 'C:\\Users\\thiag.LAPTOP-8A3IHU16\\mozilla\\notebook\\notebooks' );
         this.#sthGetNotebooks = this.#db.prepare( queries.getNotebooksSQL );
         this.getNotebooks( )
-        .then( res => {
-            this.notebooks = res
-        })
         .catch( err => console.log ( err ) );
+        this.openedNotebooks = [];
     }
 
     getNotebooks( filterStr, sorting ) {
@@ -42,8 +44,29 @@ class BigBook {
     }
 
     createNotebook( notebookName ) {
-        let createNotebookQuerie = queries.createTableSTR( notebookName );
-        return this.#execDDQuery( createNotebookQuerie )
+        notebookName = this.#normalizeNotebookname( notebookName );
+        if( notebookName ) {
+            let createNotebookQuerie = queries.createTableSTR( notebookName );
+            return this.#execDDQuery( createNotebookQuerie );
+        } else {
+            return new Promise( ( resolve, reject ) => {
+                reject( 'Invalide notebook name');
+            })
+        }
+    }
+
+    openNotebook( notebookName, dbConnection ) {
+        if( this.openedNotebooks.find( el => el.name === notebookName ) ) {
+            console.log( 'Notebook Already Opened' );
+            return undefined;
+        } else if( this.notebooks.find( el => el === notebookName ) ) {
+            let nb = new Notebook( notebookName, dbConnection );
+            this.openedNotebooks.push( nb );
+            return nb;
+        } else {
+            console.log( 'Notebook Does Not Exists!' );
+            return undefined
+        }
     }
 
     deleteNotebook( notebookName ) {
@@ -85,6 +108,16 @@ class BigBook {
                 }
             })
         })
+    }
+
+    #normalizeNotebookname( notebookName ) {
+        let initialRegex = /^\d+/;
+        let excludeRanges = /[!-/:-@\[-^`{-¿×ØÝ-ß÷þ]/
+        let invalidChar = excludeRanges.exec( notebookName )
+        if( invalidChar ) {
+           return false;
+        }
+        return initialRegex.exec( notebookName ) ? notebookName.replace( /(^\d+)/, '_$1' ) : notebookName;
     }
 
 }

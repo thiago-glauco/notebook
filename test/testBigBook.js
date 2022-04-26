@@ -4,7 +4,7 @@ const allNoteBooks = require( '../models/bigbook' );
 describe( 'Testing bigBook Class', ( ) => {
     let myNotebooks = new allNoteBooks( );
     it( 'Will create a notebook called important', ( ) => {
-        return myNotebooks.createNotebook( 'important' )
+        return myNotebooks.createNotebook( 'important-' )
         .then( result => {
             console.log( result );
             expect( result ).to.be.a( 'string' );
@@ -16,7 +16,7 @@ describe( 'Testing bigBook Class', ( ) => {
         .then( result => {
             console.log( result );
             expect( result ).to.be.an( 'array' );
-            expect( result ).to.contains( 'important')
+            expect( result ).contains( 'important')
         })
     })
     it( 'Will delete a Notebook', ( ) => {
