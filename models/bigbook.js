@@ -1,4 +1,4 @@
-const sqlite = require("sqlite3");
+const sqlite = require("sqlite3").verbose( );
 const queries = require("../libs/sqlite_templates");
 const Notebook = require( "./notebook" );
 
@@ -22,25 +22,23 @@ class BigBook {
 
     constructor( ) {
         this.#db = new sqlite.Database( 'C:\\Users\\thiag.LAPTOP-8A3IHU16\\mozilla\\notebook\\notebooks' );
-        this.#sthGetNotebooks = this.#db.prepare( queries.getNotebooksSQL );
-        this.getNotebooks( )
-        .catch( err => console.log ( err ) );
+        this.#sthGetNotebooks = this.#db.prepare( queries.getNotebooksSQL, ( err ) => {
+            if( err ) {
+                console.log( err );
+            }
+        } );
+        this.#getNotebooks( )
         this.openedNotebooks = [];
     }
 
-    getNotebooks( filterStr, sorting ) {
-        let that = this;
-        return new Promise( (resolve, reject ) => {
-            that.#sthGetNotebooks.all( (err, rows) => {
-                if( err ) {
-                    reject( err )
-                } else {
-                    this.notebooks = rows.map( row => { return row.tbl_name } );
-                    resolve( this.notebooks );
-                }
-            })
+    #getNotebooks( ) {
+        this.#sthGetNotebooks.all( (err, rows) => {
+            if( err ) {
+                console.log( err );
+            } else {
+                this.notebooks = rows.map( row => { return row.tbl_name } );
+            }
         })
-        
     }
 
     createNotebook( notebookName ) {
@@ -55,12 +53,12 @@ class BigBook {
         }
     }
 
-    openNotebook( notebookName, dbConnection ) {
+    openNotebook( notebookName ) {
         if( this.openedNotebooks.find( el => el.name === notebookName ) ) {
             console.log( 'Notebook Already Opened' );
             return undefined;
         } else if( this.notebooks.find( el => el === notebookName ) ) {
-            let nb = new Notebook( notebookName, dbConnection );
+            let nb = new Notebook( notebookName, this.#db );
             this.openedNotebooks.push( nb );
             return nb;
         } else {

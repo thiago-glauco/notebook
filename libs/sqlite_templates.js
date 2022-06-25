@@ -10,7 +10,7 @@
 
 module.exports.createTableSTR = ( notebookName ) => {
     return `create table if not exists "${notebookName}" (
-    title text not null check( length( title ) <= 100 ),
+    title text not null unique check( length( title ) <= 100 ),
     owner text not null check( length( owner ) <= 100 ),
     note  text check( length( note ) <= 500 ),
     created_at text dafault CURRENT_TIMESTAMP
@@ -22,7 +22,7 @@ module.exports.dropTableSTR = ( notebookName ) => {
 };
 
 module.exports.insertNote = ( notebookName ) => {
-    return `insert (title, owner, note) values(?, ?, ?) into "${notebookName}";`
+    return `insert into "${notebookName}" (title, owner, note, created_at) values(?,?,?, datetime( 'now' ) );`
 }
 
 module.exports.getNotes = ( notebookName ) => {
